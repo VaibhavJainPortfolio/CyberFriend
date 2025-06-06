@@ -1,27 +1,25 @@
 # agents/risk_scorer.py
 
 def score_risk(analysis_text: str) -> dict:
-    """
-    Parses the analysis text and assigns a numerical risk score and level.
-    Returns a dictionary with 'score' and 'level'.
-    """
+    text = analysis_text.lower().replace("?", "").strip()
 
-    analysis_text = analysis_text.lower()
+    # Check English keywords
+    if "suspicious" in text:
+        if "yes" in text:
+            return {"score": 85, "level": "High"}
+        elif "maybe" in text:
+            return {"score": 50, "level": "Medium"}
+        elif "no" in text:
+            return {"score": 10, "level": "Low"}
 
-    if "yes" in analysis_text:
-        score = 85
-        level = "High"
-    elif "maybe" in analysis_text or "possibly" in analysis_text:
-        score = 50
-        level = "Medium"
-    elif "no" in analysis_text:
-        score = 10
-        level = "Low"
-    else:
-        score = 30
-        level = "Unknown"
+    # Check Hindi keywords
+    if "संदिग्ध" in text:
+        if "हाँ" in text:
+            return {"score": 85, "level": "High"}
+        elif "शायद" in text:
+            return {"score": 50, "level": "Medium"}
+        elif "नहीं" in text:
+            return {"score": 10, "level": "Low"}
 
-    return {
-        "score": score,
-        "level": level
-    }
+    # Default fallback
+    return {"score": 30, "level": "Unknown"}

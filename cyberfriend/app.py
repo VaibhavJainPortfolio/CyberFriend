@@ -2,47 +2,51 @@
 
 import streamlit as st
 from agents.content_analyzer import detect_type
-from agents.scam_detector import check_scam
+from agents.scam_detector import check_scam, detect_language
 from agents.risk_scorer import score_risk
 from agents.recommendation import get_recommendation
 
+# Set page config
 st.set_page_config(page_title="CyberFriend - Scam Detector", layout="centered")
 st.title("🛡️ CyberFriend: Scam Detector & Advisor")
 
-st.markdown("Enter a suspicious message, choose your model provider, and let our agents assess the risk.")
+st.markdown("Enter a suspicious message, choose your AI provider, and let our agents analyze it intelligently.")
 
-# User selects provider and enters API key
-model_provider = st.selectbox("Choose Model Provider", ["OpenAI", "Claude"])
-api_key = st.text_input("Enter your API Key (won’t be stored)", type="password")
+# Provider + API Key input
+model_provider = st.selectbox("🤖 Choose AI Model Provider", ["OpenAI", "Claude"])
+api_key = st.text_input("🔑 Enter your API Key (never stored)", type="password")
 
-# User inputs message
-user_input = st.text_area("🔍 Paste the suspicious content here", height=200)
+# Input area
+user_input = st.text_area("📝 Paste the suspicious message or link below", height=200)
 
-# Analyze Button
+# Analyze
 if st.button("🔎 Analyze"):
     if not user_input.strip() or not api_key:
-        st.warning("Please enter both a message and your API key.")
+        st.warning("Please enter both the message and your API key.")
     else:
-        with st.spinner("Analyzing using Cyber Agents..."):
-            # 1. Detect Type
-            content_type = detect_type(user_input)
+        with st.spinner("Analyzing with Cyber Agents..."):
 
-            # 2. Scam Detection
+            # Detect message type and language
+            content_type = detect_type(user_input)
+            language = detect_language(user_input)
+
+            # Scam analysis
             scam_analysis = check_scam(user_input, model_provider=model_provider, api_key=api_key)
 
-            # 3. Risk Scoring
+            # Score it
             risk = score_risk(scam_analysis)
-            risk_score = risk['score']
-            risk_level = risk['level']
+            risk_score = risk["score"]
+            risk_level = risk["level"]
 
-            # 4. Recommendation
-            advice = get_recommendation(risk_level)
+            # Recommendation (in user's language)
+            advice = get_recommendation(risk_level, language)
 
         # Display Results
         st.success("✅ Analysis Complete!")
 
-        st.subheader("📄 Content Type")
-        st.markdown(f"**Detected Type:** `{content_type}`")
+        st.subheader("📄 Detected Info")
+        st.markdown(f"- **Type:** `{content_type}`")
+        st.markdown(f"- **Language:** `{language}`")
 
         st.subheader("🧠 Scam Analysis")
         st.markdown(scam_analysis)
@@ -52,3 +56,7 @@ if st.button("🔎 Analyze"):
 
         st.subheader("🧭 Recommendation")
         st.markdown(advice)
+
+# Footer
+st.markdown("---")
+st.markdown("🚀 Built with ❤️ by **Neuratantra AI** | Vaibhav Jain")

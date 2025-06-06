@@ -1,4 +1,5 @@
-openai>=1.0.0
 streamlit
-python-dotenv
+openai>=1.0.0
 anthropic
+langdetect
+python-dotenv
